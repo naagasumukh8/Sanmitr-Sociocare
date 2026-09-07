@@ -1,0 +1,19 @@
+// QA fix: route images and videos to their intended Supabase Storage buckets.
+(function(){
+  window.uploadMedia = async function(ev){
+    const file=ev.target.files?.[0]; if(!file)return;
+    const msg=document.getElementById('content-msg'); if(msg)msg.textContent='Uploading…';
+    try{
+      const isVideo=file.type.startsWith('video/');
+      const bucket=isVideo?'showcase-videos':'showcase-images';
+      const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+      const path=`${Date.now()}-${safe}`;
+      const r=await fetch(`https://wqospnmxrqvvyfmijonb.supabase.co/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{apikey:'sb_publishable_ytkREDQ05JGErtOloi_0AQ_ZIX8FzX8K',Authorization:`Bearer ${localStorage.getItem('sb_access_token')||''}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});
+      if(!r.ok)throw Error(await r.text());
+      const url=`https://wqospnmxrqvvyfmijonb.supabase.co/storage/v1/object/public/${bucket}/${path}`;
+      const urlInput=document.querySelector('[name=media_url]'); const typeInput=document.querySelector('[name=media_type]');
+      if(urlInput)urlInput.value=url; if(typeInput)typeInput.value=isVideo?'video':'image';
+      if(msg)msg.textContent=`${isVideo?'Video':'Image'} upload complete. Submit the form to save it.`;
+    }catch(e){if(msg)msg.textContent='Upload failed: '+e.message;}
+  };
+})();
