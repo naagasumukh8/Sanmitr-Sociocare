@@ -1,0 +1,2 @@
+// Homepage-only login CTA. Keeps the main navigation unchanged on other pages.
+document.addEventListener('DOMContentLoaded',()=>{const nav=document.querySelector('#main-nav');if(!nav||nav.querySelector('a[href="login.html"]'))return;const a=document.createElement('a');a.className='cta';a.href='login.html';a.textContent='🔐 Login';nav.appendChild(a);});
